@@ -26,6 +26,17 @@ class Inventories(Base):
     version = Column(Integer)
     set_num = Column(String(25), ForeignKey("sets.set_num"))
 
+class Parts(Base):
+    __tablename__ = "parts"
+    part_num = Column(String(25), primary_key=True)
+    part_name = Column(String(255))
+    part_cat_id = Column(Integer, ForeignKey("part_categories.part_cat_id"))
+
+class PartCategories(Base):
+    __tablename__ = "part_categories"
+    part_cat_id = Column(Integer, primary_key=True, autoincrement=False)
+    part_cat_name = Column(String(255))
+
 
 if __name__ == "__main__":
     engine = create_engine('sqlite:///data/db/lego_db_test.db')
