@@ -9,7 +9,7 @@ Base = declarative_base()
 class Sets(Base):
     __tablename__ = "sets"
     set_num = Column(String(25), primary_key=True)
-    name = Column(String(255))
+    set_name = Column(String(255))
     year = Column(Integer)
     theme_id = Column(Integer, ForeignKey("themes.theme_id"))
     num_parts = Column(Integer)
@@ -17,7 +17,7 @@ class Sets(Base):
 class Themes(Base):
     __tablename__ = "themes"
     theme_id = Column(Integer, primary_key=True, autoincrement=False)
-    name = Column(String(255))
+    theme_name = Column(String(255))
     parent_id = Column(Integer)
 
 class Inventories(Base):
