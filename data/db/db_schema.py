@@ -11,20 +11,21 @@ class Sets(Base):
     set_num = Column(String(25), primary_key=True)
     name = Column(String(255))
     year = Column(Integer)
-    theme_id = Column(Integer, ForeignKey("themes.id"))
+    theme_id = Column(Integer, ForeignKey("themes.theme_id"))
     num_parts = Column(Integer)
 
 class Themes(Base):
     __tablename__ = "themes"
-    id = Column(Integer, primary_key=True, autoincrement=False)
+    theme_id = Column(Integer, primary_key=True, autoincrement=False)
     name = Column(String(255))
     parent_id = Column(Integer)
 
 class Inventories(Base):
     __tablename__ = "inventories"
-    id = Column(Integer, primary_key=True, autoincrement=False)
+    inventory_id = Column(Integer, primary_key=True, autoincrement=False)
     version = Column(Integer)
     set_num = Column(String(25), ForeignKey("sets.set_num"))
+
 
 if __name__ == "__main__":
     engine = create_engine('sqlite:///data/db/lego_db_test.db')
