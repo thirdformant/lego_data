@@ -20,6 +20,12 @@ class Themes(Base):
     name = Column(String(255))
     parent_id = Column(Integer)
 
+class Inventories(Base):
+    __tablename__ = "inventories"
+    id = Column(Integer, primary_key=True, autoincrement=False)
+    version = Column(Integer)
+    set_num = Column(String(25), ForeignKey("sets.set_num"))
+
 if __name__ == "__main__":
     engine = create_engine('sqlite:///data/db/lego_db_test.db')
     Base.metadata.create_all(engine)
