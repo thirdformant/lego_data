@@ -37,6 +37,13 @@ class PartCategories(Base):
     part_cat_id = Column(Integer, primary_key=True, autoincrement=False)
     part_cat_name = Column(String(255))
 
+class Colors(Base):
+    __tablename__ = "colors"
+    id = Column(Integer, primary_key=True, autoincrement=False)
+    name = Column(String(40))
+    rgb = Column(String(6))
+    is_trans = Column(Boolean)
+
 
 if __name__ == "__main__":
     engine = create_engine('sqlite:///data/db/lego_db_test.db')
