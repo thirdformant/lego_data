@@ -1,50 +1,98 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, ForeignKey, Integer, DateTime, Boolean
-from sqlalchemy.orm import relationship, backref
+import sqlite3
+
+def create_connection(db):
+    """ Creates connection to specified database file
+    :param db: location of db file
+    :return: DB connection object or none
+    """
+    try:
+        conn = sqlite3.connect(db)
+        return conn
+    except Exception as e:
+        print(e)
+
+def create_table(conn, sql_create_table):
+    """ Creates database table from to SQL statement
+    :param conn: db connection object
+    :param sql_create_table: CREATE TABLE SQL statement
+    :return:
+    """
+    try:
+        c = conn.cursor()
+        c.execute(sql_create_table)
+    except Exception as e:
+        print(e)
+
+def main():
+    database = "./data/db/lego_db_test.db"
+
+    sets_table = """CREATE TABLE sets (
+        set_num TEXT PRIMARY KEY,
+        name TEXT,
+        year INTEGER,
+        theme_id INTEGER REFERENCES themes(id),
+        num_parts INTEGER
+    );"""
+
+    themes_table = """CREATE TABLE themes (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        parent_id INTEGER
+    );"""
+
+    inventories_table = """CREATE TABLE inventories (
+        id INTEGER PRIMARY KEY,
+        version INTEGER,
+        set_num INTEGER REFERENCES sets(set_num)
+    );"""
+
+    parts_table = """CREATE TABLE parts (
+        part_num TEXT PRIMARY KEY,
+        part_name TEXT,
+        part_cat_id INTEGER REFERENCES part_categories(id)
+    );"""
+
+    categories_table = """CREATE TABLE part_categories (
+        id INTEGER PRIMARY KEY,
+        name TEXT
+    );"""
+
+    colors_table = """CREATE TABLE colors (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        rgb TEXT,
+        is_trans BOOLEAN
+    );"""
+
+    invpart_table = """CREATE TABLE inventory_parts (
+        id INTEGER PRIMARY KEY,
+        inventory_id INTEGER REFERENCES inventories(id),
+        part_num TEXT REFERENCES parts(part_num),
+        color_id INTEGER REFERENCES colors(id),
+        quantity INTEGER,
+        is_spare BOOLEAN
+    );"""
+
+    invsets_table = """CREATE TABLE inventory_sets (
+        id INTEGER PRIMARY KEY,
+        inventory_id INTEGER REFERENCES inventories(id),
+        set_num TEXT REFERENCES sets(set_num),
+        quantity INTEGER
+    );"""
+
+    conn = create_connection(database)
+    if conn is not None:
+        create_table(conn, sets_table)
+        create_table(conn, themes_table)
+        create_table(conn, inventories_table)
+        create_table(conn, parts_table)
+        create_table(conn, categories_table)
+        create_table(conn, colors_table)
+        create_table(conn, invpart_table)
+        create_table(conn, invsets_table)
+    else:
+        print("Cannot create the database connection")
 
 
-Base = declarative_base()
-
-class Sets(Base):
-    __tablename__ = "sets"
-    set_num = Column(String(25), primary_key=True)
-    name = Column(String(255))
-    year = Column(Integer)
-    theme_id = Column(Integer, ForeignKey("themes.id"))
-    num_parts = Column(Integer)
-
-class Themes(Base):
-    __tablename__ = "themes"
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    name = Column(String(255))
-    parent_id = Column(Integer)
-
-class Inventories(Base):
-    __tablename__ = "inventories"
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    version = Column(Integer)
-    set_num = Column(String(25), ForeignKey("sets.set_num"))
-
-class Parts(Base):
-    __tablename__ = "parts"
-    part_num = Column(String(25), primary_key=True)
-    part_name = Column(String(255))
-    part_cat_id = Column(Integer, ForeignKey("part_categories.part_cat_id"))
-
-class PartCategories(Base):
-    __tablename__ = "part_categories"
-    part_cat_id = Column(Integer, primary_key=True, autoincrement=False)
-    part_cat_name = Column(String(255))
-
-class Colors(Base):
-    __tablename__ = "colors"
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    name = Column(String(40))
-    rgb = Column(String(6))
-    is_trans = Column(Boolean)
-
-
-if __name__ == "__main__":
-    engine = create_engine('sqlite:///data/db/lego_db_test.db')
-    Base.metadata.create_all(engine)
+if __name__ == '__main__':
+    main()
