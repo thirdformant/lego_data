@@ -14,7 +14,7 @@ def create_table(conn, sql_create_table):
         print(e)
 
 def main():
-    database = "./lego_db_test.db"
+    database = "./data/db/lego_db_test.db"
 
     sets_table = """CREATE TABLE sets (
         set_num TEXT PRIMARY KEY,
