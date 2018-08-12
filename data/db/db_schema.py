@@ -65,8 +65,7 @@ def main():
     );"""
 
     invpart_table = """CREATE TABLE inventory_parts (
-        id INTEGER PRIMARY KEY,
-        inventory_id INTEGER REFERENCES inventories(id),
+        inventory_id INTEGER PRIMARY KEY REFERENCES inventories(id),
         part_num TEXT REFERENCES parts(part_num),
         color_id INTEGER REFERENCES colors(id),
         quantity INTEGER,
@@ -74,8 +73,7 @@ def main():
     );"""
 
     invsets_table = """CREATE TABLE inventory_sets (
-        id INTEGER PRIMARY KEY,
-        inventory_id INTEGER REFERENCES inventories(id),
+        inventory_id INTEGER PRIMARY KEY REFERENCES inventories(id),
         set_num TEXT REFERENCES sets(set_num),
         quantity INTEGER
     );"""
