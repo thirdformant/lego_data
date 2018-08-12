@@ -1,15 +1,5 @@
 import sqlite3
-
-def create_connection(db):
-    """ Creates connection to specified database file
-    :param db: location of db file
-    :return: DB connection object or none
-    """
-    try:
-        conn = sqlite3.connect(db)
-        return conn
-    except Exception as e:
-        print(e)
+from db_helpers import create_connection
 
 def create_table(conn, sql_create_table):
     """ Creates database table from to SQL statement
@@ -24,7 +14,7 @@ def create_table(conn, sql_create_table):
         print(e)
 
 def main():
-    database = "./data/db/lego_db_test.db"
+    database = "./lego_db_test.db"
 
     sets_table = """CREATE TABLE sets (
         set_num TEXT PRIMARY KEY,
