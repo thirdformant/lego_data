@@ -36,11 +36,11 @@ def parse_arguments()->dict:
 
     parser = argparse.ArgumentParser(description="Create an sqlite database for the Lego dataset with the provided schema.")
     parser.add_argument("-in", "--input_dir", type=str, default=INPUT_PATH,
-        help="Path to input .csv directory.")
+        dest="input_dir", help="Path to input .csv directory.")
     parser.add_argument("-out", "--output_dir", type=str, default=OUTPUT_PATH,
-        help="Path to use for sqlite database.")
+        dest="output_dir", help="Path to use for sqlite database.")
     parser.add_argument("-delete", "--delete_db", type=bool, default=True,
-        help="If the db already exists in the output path, delete and rebuild it.")
+        dest="del_db", help="If the db already exists in the output path, delete and rebuild it.")
     args = parser.parse_args()
     return vars(args)
 
@@ -64,9 +64,15 @@ def create_connection(db):
 # Main script
 #==================
 def main():
+    DATE_TIME = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     #------------------
     # Arguments
     #------------------
+    args = parse_arguments()
+    input_dir = args['input_dir']
+    output_dir = args['output_dir']
+    del_db = args['del_db']
+
 
     #------------------
     # Logger
@@ -75,5 +81,8 @@ def main():
     LOGGER.setLevel(logging.DEBUG)
     LOGGER_OUTPUT = os.path.join(output_dir, DATE_TIME + '.log')
     init_logger(LOGGER, LOGGER_OUTPUT)
-
     LOGGER.info('Initialised logger')
+
+
+if __name__ == '__main__':
+    main()
