@@ -39,7 +39,7 @@ def parse_arguments()->dict:
         dest="input_dir", help="Path to input .csv directory.")
     parser.add_argument("-out", "--output_db", type=str, default=OUTPUT_FILE,
         dest="output_db", help="Filename to use for sqlite database.")
-    parser.add_argument("-delete", "--delete_db", type=bool, default=True,
+    parser.add_argument("-delete", "--delete_db", type=bool, default=False,
         dest="del_db", help="If the db already exists in the output path, delete and rebuild it.")
     args = parser.parse_args()
     return vars(args)
@@ -156,6 +156,7 @@ def main():
     output_db = args['output_db']
     del_db = args['del_db']
 
+
     #------------------
     # Logger
     #------------------
@@ -164,6 +165,17 @@ def main():
     LOGGER_OUTPUT = os.path.join(output_dir, DATE_TIME + '.log')
     init_logger(LOGGER, LOGGER_OUTPUT)
     LOGGER.info('Initialised logger')
+
+
+    #------------------
+    # Make db
+    #------------------
+    if del_db:
+        try:
+            os.remove(output_dir / output_db)
+        except Exception as e:
+            LOGGER.exception(e)
+            LOGGER.info("No existing database of that name was found.")
 
 
 if __name__ == '__main__':
