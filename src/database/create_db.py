@@ -37,8 +37,8 @@ def parse_arguments()->dict:
     parser = argparse.ArgumentParser(description="Create an sqlite database for the Lego dataset with the provided schema.")
     parser.add_argument("-in", "--input_dir", type=str, default=INPUT_PATH,
         dest="input_dir", help="Path to input .csv directory.")
-    parser.add_argument("-out", "--output_dir", type=str, default=OUTPUT_PATH,
-        dest="output_dir", help="Path to use for sqlite database.")
+    parser.add_argument("-out", "--output_db", type=str, default=OUTPUT_FILE,
+        dest="output_db", help="Filename to use for sqlite database.")
     parser.add_argument("-delete", "--delete_db", type=bool, default=True,
         dest="del_db", help="If the db already exists in the output path, delete and rebuild it.")
     args = parser.parse_args()
@@ -60,7 +60,7 @@ def create_connection(db:str)->sqlite3.connect:
         LOGGER.exception(e)
 
 
-def create_table(conn:sqlite.conn, sql_create_table:str):
+def create_table(conn, sql_create_table:str):
     """ Creates database table from to SQL statement
     :param conn: db connection object
     :param sql_create_table: CREATE TABLE SQL statement
@@ -73,8 +73,8 @@ def create_table(conn:sqlite.conn, sql_create_table:str):
         LOGGER.exception(e)
 
 
-def make_database(output:str):
-    database = output_dir
+def make_database(output_path:Path, output:str):
+    database = output_path / output
 
     sets_table = """CREATE TABLE sets (
         set_num TEXT PRIMARY KEY,
@@ -144,14 +144,17 @@ def make_database(output:str):
 #==================
 def main():
     DATE_TIME = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    output_dir = Path("data/db")
+
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
     #------------------
     # Arguments
     #------------------
     args = parse_arguments()
     input_dir = args['input_dir']
-    output_dir = args['output_dir']
+    output_db = args['output_db']
     del_db = args['del_db']
-
 
     #------------------
     # Logger
