@@ -1,5 +1,5 @@
 import sqlite3
-from db_helpers import create_connection
+from db_insertion import create_connection
 
 def create_table(conn, sql_create_table):
     """ Creates database table from to SQL statement
