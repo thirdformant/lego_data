@@ -39,8 +39,6 @@ def parse_arguments()->dict:
         dest="input_dir", help="Path to input .csv directory.")
     parser.add_argument("-out", "--output_db", type=str, default=OUTPUT_FILE,
         dest="output_db", help="Filename to use for sqlite database.")
-    parser.add_argument("-delete", "--delete_db", type=bool, default=False,
-        dest="del_db", help="If the db already exists in the output path, delete and rebuild it.")
     args = parser.parse_args()
     return vars(args)
 
@@ -74,7 +72,12 @@ def create_table(conn, sql_create_table:str):
 
 
 def make_database(output_path:Path, output:str):
-    database = output_path / output
+
+    database = str(output_path / output)
+    if os.path.isfile(database):
+        LOGGER.info("Overwriting the existing db at {}".format(database))
+        os.remove(database)
+
 
     sets_table = """CREATE TABLE sets (
         set_num TEXT PRIMARY KEY,
@@ -143,6 +146,11 @@ def make_database(output_path:Path, output:str):
 # Main script
 #==================
 def main():
+    LOGGER.info("Creating the Lego database...")
+    make_database(output_dir, output_db)
+
+
+if __name__ == '__main__':
     DATE_TIME = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     output_dir = Path("data/db")
 
@@ -154,7 +162,6 @@ def main():
     args = parse_arguments()
     input_dir = args['input_dir']
     output_db = args['output_db']
-    del_db = args['del_db']
 
 
     #------------------
@@ -170,13 +177,4 @@ def main():
     #------------------
     # Make db
     #------------------
-    if del_db:
-        try:
-            os.remove(output_dir / output_db)
-        except Exception as e:
-            LOGGER.exception(e)
-            LOGGER.info("No existing database of that name was found.")
-
-
-if __name__ == '__main__':
     main()
