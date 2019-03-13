@@ -4,6 +4,7 @@ import logging
 import sqlite3
 import argparse
 from pathlib import Path
+import pandas as pd
 
 from db_config import *
 
@@ -142,14 +143,33 @@ def make_database(output_path:Path, output:str):
     create_table(conn, invsets_table)
 
 
+def insert_data(output_path:Path, output:str):
+    database = str(output_path / output)
+    conn = create_connection(database)
+
+    data_path = Path("data/raw")
+    LOGGER.info("Reading in raw data from {}...".format(data_path))
+
+    sets_csv = pd.read_csv(data_path / "sets.csv")
+    themes_csv = pd.read_csv(data_path / "themes.csv")
+    inventories_csv = pd.read_csv(data_path / "inventories.csv")
+    parts_csv = pd.read_csv(data_path / "parts.csv")
+    colors_csv = pd.read_csv(data_path / "colors.csv")
+    inventory_sets_csv = pd.read_csv(data_path / "inventory_sets.csv")
+    inventory_parts_csv = pd.read_csv(data_path / "inventory_parts.csv")
+
+    sets_csv.to_sql("sets", conn, if_exists='replace', index=False)
+    themes_csv.to_sql("themes", conn, if_exists='replace', index=False)
+    inventories_csv.to_sql("inventories", conn, if_exists="replace", index=False)
+    parts_csv.to_sql("parts", conn, if_exists="replace", index=False)
+    colors_csv.to_sql("colors", conn, if_exists="replace", index=False)
+    inventory_sets_csv.to_sql("inventory_sets", conn, if_exists="replace", index=False)
+    inventory_parts_csv.to_sql("inventory_parts", conn, if_exists="replace", index=False)
+
+
 #==================
 # Main script
 #==================
-def main():
-    LOGGER.info("Creating the Lego database...")
-    make_database(output_dir, output_db)
-
-
 if __name__ == '__main__':
     DATE_TIME = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     output_dir = Path("data/db")
@@ -177,4 +197,8 @@ if __name__ == '__main__':
     #------------------
     # Make db
     #------------------
-    main()
+    LOGGER.info("Creating the Lego database...")
+    make_database(output_dir, output_db)
+
+    LOGGER.info("Inserting data into the Lego database...")
+    insert_data(output_dir, output_db)
